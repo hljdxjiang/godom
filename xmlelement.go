@@ -381,3 +381,23 @@ func (e *Element) selectNodesByDirectPath(s string) []*Element {
 	}
 	return arr
 }
+
+func (e *Element) RemoveChild(c *Element) {
+	nc := make([]*Element, 0)
+	if e != nil {
+		for _, e := range e.child {
+			if e != c {
+				nc = append(nc, e)
+			}
+		}
+		e.child = nc
+	}
+}
+func (e *Element) HasChildNode() bool {
+	ret := false
+	if len(e.child) > 0 {
+		ret = true
+	}
+	return ret
+
+}
