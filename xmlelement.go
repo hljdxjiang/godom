@@ -37,6 +37,10 @@ func (e *Element) checkExistsNameSpace(s string) bool {
 	return false
 }
 
+func (e *Element) ChildNodes() []*Element {
+	return e.child
+}
+
 func (e *Element) GetPrefix() string {
 	if e.space == "" {
 		return ""
@@ -270,7 +274,10 @@ func (e *Element) GetValue() string {
 }
 
 func (e *Element) SelectSignalNode(s string) *Element {
-	if len(strings.Split(s, ":")) > 0 {
+	if e == nil {
+		return nil
+	}
+	if len(strings.Split(s, ":")) > 1 {
 		panic("Can't select node with NameSpace")
 	}
 	arr := strings.Split(s, "/")
@@ -355,6 +362,9 @@ func (e *Element) selectNodeWithPrefixBydirect(s string) *Element {
 }
 
 func (e *Element) SelectNodes(s string) []*Element {
+	if e == nil {
+		return nil
+	}
 	arr := strings.Split(s, "/")
 	_e := e
 	for i := 0; i < len(arr)-1; i++ {
