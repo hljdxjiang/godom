@@ -273,26 +273,29 @@ func (e *Element) GetValue() string {
 	return ret
 }
 
-func (e *Element) SelectSignalNode(s string) *Element {
+func (e *Element) SelectSignalNode(s string) (*Element, error) {
 	if e == nil {
-		return nil
+		return nil, errors.New("nil pointer exception")
 	}
 	if len(strings.Split(s, ":")) > 1 {
-		panic("Can't select node with NameSpace")
+		return nil, errors.New("Can't select node with NameSpace")
 	}
 	arr := strings.Split(s, "/")
 	_e := e
 	for _, val := range arr {
 		ne := _e.selectSignalNodeByDirectPath(val)
 		if ne == nil {
-			return nil
+			return nil, errors.New("Node < " + s + "> is not exists in <" + e.name + ">")
 		}
 		_e = ne
 	}
-	return _e
+	return _e, nil
 }
 
 func (e *Element) selectSignalNodeByDirectPath(s string) *Element {
+	if e == nil {
+		return nil
+	}
 	for _, val := range e.child {
 		if val.name == s {
 			return val
@@ -301,20 +304,26 @@ func (e *Element) selectSignalNodeByDirectPath(s string) *Element {
 	return nil
 }
 
-func (e *Element) SelectSingalNodeWithPrefix(s string) *Element {
+func (e *Element) SelectSingalNodeWithPrefix(s string) (*Element, error) {
+	if e == nil {
+		return nil, errors.New("nil pointer exception")
+	}
 	arr := strings.Split(s, "/")
 	_e := e
 	for _, val := range arr {
 		ne := _e.selectNodeWithPrefixBydirect(val)
 		if ne == nil {
-			return nil
+			return nil, errors.New("Node < " + s + "> is not exists in <" + e.name + ">")
 		}
 		_e = ne
 	}
-	return _e
+	return _e, nil
 }
 
-func (e *Element) SelectNodesWithPrefix(s string) []*Element {
+func (e *Element) SelectNodesWithPrefix(s string) ([]*Element, error) {
+	if e == nil {
+		return nil, errors.New("nil pointer exception")
+	}
 	arr := strings.Split(s, "/")
 	_e := e
 	for i := 0; i < len(arr)-1; i++ {
@@ -324,9 +333,12 @@ func (e *Element) SelectNodesWithPrefix(s string) []*Element {
 		}
 	}
 	if _e != nil {
-		return _e.selectNodesWithPrefixByDirect(arr[len(arr)-1])
+		xe := _e.selectNodesWithPrefixByDirect(arr[len(arr)-1])
+		if xe != nil {
+			return xe, nil
+		}
 	}
-	return nil
+	return nil, errors.New("Node < " + s + "> is not exists in <" + e.name + ">")
 }
 
 func (e *Element) selectNodesWithPrefixByDirect(s string) []*Element {
@@ -361,9 +373,9 @@ func (e *Element) selectNodeWithPrefixBydirect(s string) *Element {
 	return nil
 }
 
-func (e *Element) SelectNodes(s string) []*Element {
+func (e *Element) SelectNodes(s string) ([]*Element, error) {
 	if e == nil {
-		return nil
+		return nil, errors.New("nil pointer exception")
 	}
 	arr := strings.Split(s, "/")
 	_e := e
@@ -374,9 +386,12 @@ func (e *Element) SelectNodes(s string) []*Element {
 		}
 	}
 	if _e != nil {
-		return _e.selectNodesByDirectPath(arr[len(arr)-1])
+		xe := _e.selectNodesByDirectPath(arr[len(arr)-1])
+		if xe != nil {
+			return xe, nil
+		}
 	}
-	return nil
+	return nil, errors.New("Node < " + s + "> is not exists in <" + e.name + ">")
 }
 
 func (e *Element) selectNodesByDirectPath(s string) []*Element {
@@ -392,7 +407,10 @@ func (e *Element) selectNodesByDirectPath(s string) []*Element {
 	return arr
 }
 
-func (e *Element) RemoveChild(c *Element) {
+func (e *Element) RemoveChild(c *Element) error {
+	if e == nil {
+		return errors.New("nil pointer exception")
+	}
 	nc := make([]*Element, 0)
 	if e != nil {
 		for _, e := range e.child {
@@ -402,10 +420,11 @@ func (e *Element) RemoveChild(c *Element) {
 		}
 		e.child = nc
 	}
+	return nil
 }
 func (e *Element) HasChildNode() bool {
 	ret := false
-	if len(e.child) > 0 {
+	if e != nil && len(e.child) > 0 {
 		ret = true
 	}
 	return ret
